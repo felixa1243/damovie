@@ -1,0 +1,22 @@
+server:
+  port: 3000
+spring:
+  application:
+    name: damovie
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/damovie
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    database: postgresql
+  web:
+    resources:
+      chain:
+        strategy:
+          fixed:
+            paths: api
