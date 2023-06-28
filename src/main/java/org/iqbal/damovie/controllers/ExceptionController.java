@@ -29,8 +29,14 @@ public class ExceptionController {
         }
         return ResponseEntity.status(400).body(new ErrorResponse("X02", errors.toString()));
     }
+
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<ErrorResponse> handleMediaTypeException(HttpMediaTypeNotSupportedException exception){
-        return ResponseEntity.status(400).body(new ErrorResponse("X50",exception.getMessage()));
+    public ResponseEntity<ErrorResponse> handleMediaTypeException(HttpMediaTypeNotSupportedException exception) {
+        return ResponseEntity.status(400).body(new ErrorResponse("X50", exception.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleAllException(Exception exception) {
+        return ResponseEntity.status(500).body(new ErrorResponse("500", exception.getMessage()));
     }
 }

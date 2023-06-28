@@ -7,12 +7,13 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 public interface IMovieService {
-    Movie getByTitle(String title);
+    List<Movie> getByTitle(String title);
 
     List<Movie> getAll();
+
     Movie save(MovieRequest movieRequest);
 
-    Movie update(Long id, Movie movie) throws EntityNotFoundException;
+    Movie update(String id, Movie movie) throws EntityNotFoundException;
 
-    String delete(Long id) throws EntityNotFoundException;
+    String delete(String id) throws EntityNotFoundException;
 }

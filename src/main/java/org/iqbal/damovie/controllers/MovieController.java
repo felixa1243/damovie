@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/movies")
 public class MovieController {
@@ -18,14 +20,17 @@ public class MovieController {
     public MovieController(IMovieService movieService) {
         this.movieService = movieService;
     }
-
+    @GetMapping
+    ResponseEntity<SuccessResponse<List<Movie>>> getAllMovie(){
+        return ResponseEntity.ok(new SuccessResponse<>("200","success get all data",movieService.getAll()));
+    }
     @PostMapping
     ResponseEntity<SuccessResponse<Movie>> saveMovie(@RequestBody MovieRequest movieRequest) {
-        return ResponseEntity.ok(new SuccessResponse<>("200", "OK", movieService.save(movieRequest)));
+        return ResponseEntity.ok(new SuccessResponse<>("200", "success", movieService.save(movieRequest)));
     }
 
-    @GetMapping
-    ResponseEntity<SuccessResponse<Movie>> getByTitle(@Param(value = "title") String title) {
-        return ResponseEntity.ok(new SuccessResponse<>("200", "OK", movieService.getByTitle(title)));
+    @GetMapping("q")
+    ResponseEntity<SuccessResponse<List<Movie>>> getByTitle(@Param(value = "title") String title) {
+        return ResponseEntity.ok(new SuccessResponse<>("200", "success", movieService.getByTitle(title)));
     }
 }
