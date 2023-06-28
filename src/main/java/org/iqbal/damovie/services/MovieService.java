@@ -6,12 +6,13 @@ import org.iqbal.damovie.models.requests.MovieRequest;
 import org.iqbal.damovie.repositories.MovieRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class MovieService implements IMovieService {
@@ -32,36 +33,60 @@ public class MovieService implements IMovieService {
     }
 
     @Override
-    public Movie getByTitle(String title) {
-        Optional<Movie> result = this.movieRepository.getAllByTitle(title);
-        return result.orElseThrow();
+    public List<Movie> getByTitle(String title) {
+        return movieRepository.findAllByTitle(title);
     }
 
     @Override
-    @Transactional
     public Movie save(MovieRequest movieRequest) {
         Movie movie = modelMapper.map(movieRequest, Movie.class);
-        //check if all genre is exists
-        movieRequest.getGenresName().forEach(s -> {
-            //if not exists then save a new genre to database
-            Genre genre = genreService.getByName(s);
-            if (genre == null) {
-                genreService.save(new Genre(s));
-            }
-            //add genre into the movie
-            movie.getMovieGenres().add(genre);
-        });
-        //save movie
+        List<Movie> searchResult = getByTitle(movie.getTitle());
+        if (searchResult.size() > 0) {
+            throw new DataIntegrityViolationException("Data is exists");
+        }
+        Set<Genre> genres = saveNotExistsGenres(movieRequest.getGenresName());
+        movie.setGenres(genres);
         return movieRepository.save(movie);
     }
 
+
     @Override
-    public Movie update(Long id, Movie movie) throws EntityNotFoundException {
-        return movieRepository.findById(id).orElseThrow();
+    public Movie update(String id, MovieRequest movieRequest) throws EntityNotFoundException {
+        Movie existingMovie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Movie with id " + id + " not found"));
+        movieRepository.save(existingMovie);
+        Movie updatedMovie = modelMapper.map(existingMovie, Movie.class);
+        existingMovie.setActive(false);
+        updatedMovie.setTitle(movieRequest.getTitle());
+        updatedMovie.setDirector(movieRequest.getDirector());
+        updatedMovie.setSummary(movieRequest.getSummary());
+        updatedMovie.setActive(true);
+        Set<Genre> genres = saveNotExistsGenres(movieRequest.getGenresName());
+        updatedMovie.setGenres(genres);
+        // Save the updated movie
+        return movieRepository.save(updatedMovie);
     }
 
     @Override
-    public String delete(Long id) throws EntityNotFoundException {
+    public String delete(String id) throws EntityNotFoundException {
+        movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Movie with id " + id + " not found"));
+        movieRepository.deleteById(id);
         return "Movie with id " + id + " was successfully deleted!";
     }
+
+    private Set<Genre> saveNotExistsGenres(Set<String> stringGenres) {
+        return stringGenres
+                .stream()
+                .map(genreName -> {
+                    Genre genre = genreService.getByName(genreName);
+                    if (genre == null) {
+                        genre = new Genre(genreName);
+                        genreService.save(genre);
+                    }
+                    return genre;
+                })
+                .collect(Collectors.toSet());
+    }
+
 }

@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GenreService implements IGenreService {
     private final GenreRepository genreRepository;
+
     @Autowired
     public GenreService(GenreRepository genreRepository) {
         this.genreRepository = genreRepository;
@@ -22,13 +22,12 @@ public class GenreService implements IGenreService {
     }
 
     @Override
-    public Genre getByName(String name) {
-        Optional<Genre> result = genreRepository.findByGenreName(name);
-        return result.orElse(null);
+    public List<Genre> getAll() {
+        return genreRepository.findAll();
     }
 
     @Override
-    public List<Genre> getAll() {
-        return genreRepository.findAll();
+    public Genre getByName(String name) {
+        return genreRepository.findByName(name).orElse(null);
     }
 }

@@ -9,9 +9,8 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Genre {
     @Id
-    @Column(name = "genre_name")
-    private String genreName;
+    @Column(name = "genre_name", nullable = false)
+    private String name;
 }
