@@ -15,5 +15,5 @@ public class MovieRequest {
     @Length(min = 10, max = 100)
     String summary;
     @NotEmpty(message = "genres is required")
-    Set<Long> genresId;
+    Set<String> genresName;
 }

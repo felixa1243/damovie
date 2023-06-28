@@ -1,5 +1,6 @@
 package org.iqbal.damovie.services;
 
+import org.iqbal.damovie.models.Genre;
 import org.iqbal.damovie.models.Movie;
 import org.iqbal.damovie.models.requests.MovieRequest;
 import org.iqbal.damovie.repositories.MovieRepository;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class MovieService implements IMovieService {
     private final MovieRepository movieRepository;
     private final IGenreService genreService;
@@ -38,18 +38,30 @@ public class MovieService implements IMovieService {
     }
 
     @Override
+    @Transactional
     public Movie save(MovieRequest movieRequest) {
-        Movie movie = modelMapper.map(movieRequest,Movie.class);
+        Movie movie = modelMapper.map(movieRequest, Movie.class);
+        //check if all genre is exists
+        movieRequest.getGenresName().forEach(s -> {
+            //if not exists then save a new genre to database
+            Genre genre = genreService.getByName(s);
+            if (genre == null) {
+                genreService.save(new Genre(s));
+            }
+            //add genre into the movie
+            movie.getMovieGenres().add(genre);
+        });
+        //save movie
         return movieRepository.save(movie);
     }
 
     @Override
     public Movie update(Long id, Movie movie) throws EntityNotFoundException {
-        return null;
+        return movieRepository.findById(id).orElseThrow();
     }
 
     @Override
     public String delete(Long id) throws EntityNotFoundException {
-        return null;
+        return "Movie with id " + id + " was successfully deleted!";
     }
 }

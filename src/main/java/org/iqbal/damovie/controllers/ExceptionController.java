@@ -3,6 +3,7 @@ package org.iqbal.damovie.controllers;
 import org.iqbal.damovie.models.responses.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -27,5 +28,9 @@ public class ExceptionController {
             errors.add(error.getDefaultMessage());
         }
         return ResponseEntity.status(400).body(new ErrorResponse("X02", errors.toString()));
+    }
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMediaTypeException(HttpMediaTypeNotSupportedException exception){
+        return ResponseEntity.status(400).body(new ErrorResponse("X50",exception.getMessage()));
     }
 }

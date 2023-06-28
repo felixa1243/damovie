@@ -24,11 +24,11 @@ public class GenreService implements IGenreService {
     @Override
     public Genre getByName(String name) {
         Optional<Genre> result = genreRepository.findByGenreName(name);
-        return result.orElseThrow();
+        return result.orElse(null);
     }
 
     @Override
     public List<Genre> getAll() {
-        return null;
+        return genreRepository.findAll();
     }
 }
