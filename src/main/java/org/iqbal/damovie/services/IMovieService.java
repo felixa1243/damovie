@@ -5,11 +5,13 @@ import org.iqbal.damovie.models.requests.MovieRequest;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Set;
 
 public interface IMovieService {
     List<Movie> getByTitle(String title);
 
-    List<Movie> getAll();
+    Set<Movie> getAll();
+    Movie getById(String id);
 
     Movie save(MovieRequest movieRequest);
 

@@ -6,7 +6,7 @@ spring:
   application:
     name: damovie
   datasource:
-    driver-class-name: ${DB_DRIVER}
+    driver-class-name: org.postgresql.Driver
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     url: jdbc:postgresql://localhost:${DB_PORT}/${DB_DATABASE}

@@ -12,8 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/movies")
@@ -28,12 +29,12 @@ public class MovieController {
     }
 
     @GetMapping
-    ResponseEntity<SuccessResponse<List<Movie>>> getAllMovie() {
+    ResponseEntity<SuccessResponse<Set<Movie>>> getAllMovie() {
         return ResponseEntity.ok(new SuccessResponse<>("200", "success get all data", movieService.getAll()));
     }
 
     @PostMapping
-    ResponseEntity<SuccessResponse<Movie>> saveMovie(@RequestBody MovieRequest movieRequest) {
+    ResponseEntity<SuccessResponse<Movie>> saveMovie(@Valid @RequestBody MovieRequest movieRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<>("201", "success data", movieService.save(movieRequest)));
     }
 
@@ -42,13 +43,19 @@ public class MovieController {
         return ResponseEntity.ok(new SuccessResponse<>("200", "success get all data", movieService.getByTitle(title)));
     }
 
-    @PutMapping(params = "id")
-    ResponseEntity<SuccessResponse<Movie>> updateMovie(@PathParam("id") String id, MovieRequest movieRequest) {
+    @PutMapping("{id}")
+    ResponseEntity<SuccessResponse<Movie>> updateMovie(@PathVariable("id") String id, @Valid @RequestBody MovieRequest movieRequest) {
         return ResponseEntity.ok(new SuccessResponse<>("201", "success update data", movieService.update(id, movieRequest)));
     }
-    @DeleteMapping(params = "id")
-    ResponseEntity<SuccessResponse<String>> deleteMovie(@PathParam("id") String id){
-        return ResponseEntity.ok(new SuccessResponse<>(HttpStatus.NO_CONTENT.toString(),"delete data success",movieService.delete(id)));
+
+    @DeleteMapping("{id}")
+    ResponseEntity<SuccessResponse<String>> deleteMovie(@PathVariable String id) {
+        return ResponseEntity.ok(new SuccessResponse<>("200", "delete data success", movieService.delete(id)));
+    }
+
+    @GetMapping("{id}")
+    ResponseEntity<SuccessResponse<Movie>> getById(@PathVariable String id) {
+        return ResponseEntity.ok(new SuccessResponse<>("200", "success get data", movieService.getById(id)));
     }
 
     @GetMapping("/genres")
